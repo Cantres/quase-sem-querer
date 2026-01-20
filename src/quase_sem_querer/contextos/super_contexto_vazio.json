@@ -1,0 +1,87 @@
+{
+  "tipo": "super_contexto",
+  "modulos": {
+    "remuneracao": {
+      "salario_base": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      },
+      "gratificacao_funcao": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      },
+      "base_calculo_insalubridade": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      },
+      "percentual_insalubridade": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      }
+    },
+
+    "encargos_beneficios": {
+      "beneficios_mensais": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      }
+    },
+
+    "ausencias_legais": {
+      "percentual_acidente_trabalho": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      },
+      "percentual_intrajornada": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      }
+    },
+
+    "insumos": {
+      "insumos_uniformes_epi": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      },
+      "insumos_materiais_operacionais": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      }
+    },
+
+    "rescisao": {
+      "saldo_fgts": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      }
+    },
+
+    "citl": {
+      "percentual_custos_indiretos": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      },
+      "percentual_tributos": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      },
+      "percentual_lucro": {
+        "valor": null,
+        "origem": null,
+        "referencia_documental": null
+      }
+    }
+  }
+}

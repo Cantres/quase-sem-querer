@@ -1,0 +1,530 @@
+{
+  "tipo": "super_modelo",
+  "modulos": {
+    "remuneracao": {
+      "nos": [
+        {
+          "id": "salario_base",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 457; convenção ou acordo coletivo aplicável.",
+            "observacoes": "Valor informado no contexto conforme instrumento coletivo vigente"
+          }
+        },
+        {
+          "id": "gratificacao_funcao",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 457; convenção coletiva.",
+            "observacoes": "Aplicável somente quando prevista em norma coletiva ou contrato"
+          }
+        },
+        {
+          "id": "base_calculo_insalubridade",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 192; NR-15; Súmula 448/TST. Base de cálculo pode ser o salário-mínimo regional ou outra base conforme norma aplicável; a decisão sobre qual base utilizar deve constar no Contexto de Valores.",
+            "observacoes": "Valor de contexto que define a base de incidência da insalubridade (ex.: salario_minimo_regional ou salario_base), evitando lógica condicional no modelo."
+          }
+        },
+        {
+          "id": "percentual_insalubridade",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 192; NR-15; Súmula 448/TST. Percentual depende do grau técnico apurado.",
+            "observacoes": "Percentual a ser informado no contexto conforme laudo técnico ou critério aplicável"
+          }
+        },
+        {
+          "id": "adicional_insalubridade",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_calculo_insalubridade",
+            "percentual_insalubridade"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 192; NR-15; Súmula 448/TST. Incidência sobre a base definida no contexto.",
+            "observacoes": "A base de cálculo é fornecida via Contexto; o nó mantém a regra declarativa sem escolher a base por si mesmo."
+          }
+        },
+        {
+          "id": "percentual_periculosidade",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 193; Súmula 191/TST. Percentual legal aplicável.",
+            "observacoes": "Percentual fixo previsto em legislação; sem valor numérico no modelo normativo."
+          }
+        },
+        {
+          "id": "adicional_periculosidade",
+          "tipo": "multiplicacao",
+          "dependencias": ["salario_base", "percentual_periculosidade"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 193; Súmula 191/TST",
+            "observacoes": "Incide exclusivamente sobre o salário-base conforme orientação jurisprudencial; a aplicação concreta depende de laudo/decisão registrada no Contexto."
+          }
+        },
+        {
+          "id": "percentual_noturno",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 73",
+            "observacoes": "Adicional noturno mínimo previsto em lei; valor definido no Contexto se houver variação por norma coletiva."
+          }
+        },
+        {
+          "id": "adicional_noturno",
+          "tipo": "multiplicacao",
+          "dependencias": ["salario_base", "percentual_noturno"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 73",
+            "observacoes": "Aplicável quando houver jornada em período noturno; a presença de jornada noturna deve ser indicada no Contexto."
+          }
+        },
+        {
+          "id": "remuneracao_total",
+          "tipo": "soma",
+          "dependencias": [
+            "salario_base",
+            "gratificacao_funcao",
+            "adicional_periculosidade",
+            "adicional_insalubridade",
+            "adicional_noturno"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 457; metodologia SEGES.",
+            "observacoes": "Consolidação das parcelas remuneratórias; valores individuais podem ser rastreados até seu fundamento."
+          }
+        }
+      ]
+    },
+
+    "encargos_beneficios": {
+      "nos": [
+        {
+          "id": "percentual_decimo_terceiro",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Decreto nº 57.155/1965; CF, art. 7º",
+            "observacoes": "Proporcionalidade anual definida em lei; sem valor numérico no modelo normativo"
+          }
+        },
+        {
+          "id": "decimo_terceiro",
+          "tipo": "multiplicacao",
+          "dependencias": ["remuneracao_total", "percentual_decimo_terceiro"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Decreto nº 57.155/1965",
+            "observacoes": "Cálculo proporcional mensal do 13º"
+          }
+        },
+        {
+          "id": "percentual_ferias",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CF, art. 7º, XVII; CLT",
+            "observacoes": "Adicional de férias previsto em norma; sem valor numérico no modelo"
+          }
+        },
+        {
+          "id": "ferias",
+          "tipo": "multiplicacao",
+          "dependencias": ["remuneracao_total", "percentual_ferias"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CF, art. 7º, XVII; CLT",
+            "observacoes": "Provisão proporcional de férias e adicional"
+          }
+        },
+        {
+          "id": "percentual_encargos_previdenciarios",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CF, art. 195; legislação previdenciária",
+            "observacoes": "Alíquotas variam conforme regime e empresa; definidas no Contexto"
+          }
+        },
+        {
+          "id": "encargos_previdenciarios",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "remuneracao_total",
+            "percentual_encargos_previdenciarios"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CF, art. 195; legislação previdenciária",
+            "observacoes": "Incidência sobre a folha de remunerações"
+          }
+        },
+        {
+          "id": "percentual_fgts",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.036/1990, art. 15",
+            "observacoes": "Percentual legal do FGTS (modelo normativo não contém valor numérico)"
+          }
+        },
+        {
+          "id": "fgts",
+          "tipo": "multiplicacao",
+          "dependencias": ["remuneracao_total", "percentual_fgts"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.036/1990, art. 15",
+            "observacoes": "Depósito mensal sobre parcelas de natureza salarial; saldo para fins de multa deve ser registrado em 'saldo_fgts' no Contexto."
+          }
+        },
+        {
+          "id": "beneficios_mensais",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Decreto nº 95.247/1987; convenção coletiva",
+            "observacoes": "Valores informados no contexto (vale-transporte, vale-refeição, assistência etc.)"
+          }
+        },
+        {
+          "id": "encargos_beneficios_total",
+          "tipo": "soma",
+          "dependencias": [
+            "decimo_terceiro",
+            "ferias",
+            "encargos_previdenciarios",
+            "fgts",
+            "beneficios_mensais"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017, Anexo VII; legislação trabalhista",
+            "observacoes": "Consolidação distinta de encargos trabalhistas (inclui FGTS) e benefícios de natureza não salarial"
+          }
+        }
+      ]
+    },
+
+    "ausencias_legais": {
+      "nos": [
+        {
+          "id": "percentual_maternidade",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CF, art. 7º; Lei nº 13.257/2016; programa Empresa Cidadã",
+            "observacoes": "Percentual/parametrização para provisão do custo da licença-maternidade (informado no Contexto)"
+          }
+        },
+        {
+          "id": "custo_maternidade",
+          "tipo": "multiplicacao",
+          "dependencias": ["remuneracao_total", "percentual_maternidade"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 13.257/2016; CF, art. 7º",
+            "observacoes": "Provisão de custo por licença-maternidade conforme parametrização adotada"
+          }
+        },
+        {
+          "id": "percentual_paternidade",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 13.257/2016",
+            "observacoes": "Percentual/parametrização para provisão do custo da licença-paternidade (informado no Contexto)"
+          }
+        },
+        {
+          "id": "custo_paternidade",
+          "tipo": "multiplicacao",
+          "dependencias": ["remuneracao_total", "percentual_paternidade"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 13.257/2016",
+            "observacoes": "Provisão de custo por licença-paternidade"
+          }
+        },
+        {
+          "id": "percentual_acidente_trabalho",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.213/1991; CLT",
+            "observacoes": "Percentual estimado de ausência por acidente de trabalho (definido no Contexto)"
+          }
+        },
+        {
+          "id": "custo_acidente_trabalho",
+          "tipo": "multiplicacao",
+          "dependencias": ["remuneracao_total", "percentual_acidente_trabalho"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.213/1991, art. 43",
+            "observacoes": "Inclui os primeiros dias de responsabilidade do empregador e provisão de reposição"
+          }
+        },
+        {
+          "id": "percentual_intrajornada",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 71; jurisprudência",
+            "observacoes": "Percentual/estimativa de custos decorrentes de supressão parcial do intervalo intrajornada (decisão/contexto)"
+          }
+        },
+        {
+          "id": "custo_intrajornada",
+          "tipo": "multiplicacao",
+          "dependencias": ["remuneracao_total", "percentual_intrajornada"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 71",
+            "observacoes": "Provisão por eventuais pagamentos indenizatórios de intrajornada"
+          }
+        },
+        {
+          "id": "custo_ausencias_legais",
+          "tipo": "soma",
+          "dependencias": [
+            "custo_maternidade",
+            "custo_paternidade",
+            "custo_acidente_trabalho",
+            "custo_intrajornada"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 473; Lei nº 13.257/2016; Lei nº 8.213/1991",
+            "observacoes": "Agregação das provisões por ausências legais; cada componente é rastreável a partir de seu nó específico"
+          }
+        }
+      ]
+    },
+
+    "insumos": {
+      "nos": [
+        {
+          "id": "insumos_uniformes_epi",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "NRs do MTE; IN nº 05/2017; jurisprudência sobre natureza não salarial",
+            "observacoes": "Custos unitários ou mensais informados no Contexto; não compõem salário"
+          }
+        },
+        {
+          "id": "insumos_materiais_operacionais",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017; especificações contratuais",
+            "observacoes": "Equipamentos, manutenção e materiais operacionais informados no Contexto"
+          }
+        },
+        {
+          "id": "insumos_total",
+          "tipo": "soma",
+          "dependencias": [
+            "insumos_uniformes_epi",
+            "insumos_materiais_operacionais"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017, Anexo VII",
+            "observacoes": "Consolidação dos insumos não salariais necessários à execução do contrato"
+          }
+        }
+      ]
+    },
+
+    "rescisao": {
+      "nos": [
+        {
+          "id": "percentual_aviso_previo",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 487; Lei nº 12.506/2011",
+            "observacoes": "Prazo mínimo legal do aviso prévio (percentual/critério definido no Contexto quando aplicável)"
+          }
+        },
+        {
+          "id": "aviso_previo",
+          "tipo": "multiplicacao",
+          "dependencias": ["remuneracao_total", "percentual_aviso_previo"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT, art. 487; Lei nº 12.506/2011",
+            "observacoes": "Custo do aviso prévio (trabalhado ou indenizado) conforme regra normativa"
+          }
+        },
+        {
+          "id": "saldo_fgts",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.036/1990; dispositivos sobre FGTS",
+            "observacoes": "Saldo acumulado nas contas vinculadas do trabalhador — deve ser informado no Contexto (não calculado automaticamente pelo modelo normativo)."
+          }
+        },
+        {
+          "id": "percentual_multa_fgts",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.036/1990, art. 18",
+            "observacoes": "Percentual legal da multa sobre o saldo do FGTS (modelo normativo não contém valor numérico)"
+          }
+        },
+        {
+          "id": "multa_fgts",
+          "tipo": "multiplicacao",
+          "dependencias": ["saldo_fgts", "percentual_multa_fgts"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.036/1990, art. 18",
+            "observacoes": "Multa incidente sobre o saldo do FGTS apurado no Contexto em caso de despedida sem justa causa"
+          }
+        },
+        {
+          "id": "percentual_contribuicao_social_rescisao",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei Complementar nº 110/2001",
+            "observacoes": "Percentual da contribuição social incidente sobre depósitos do FGTS — especificar no Contexto"
+          }
+        },
+        {
+          "id": "contribuicao_social_rescisao",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "saldo_fgts",
+            "percentual_contribuicao_social_rescisao"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei Complementar nº 110/2001",
+            "observacoes": "Contribuição social devida em caso de despedida sem justa causa"
+          }
+        },
+        {
+          "id": "rescisao_total",
+          "tipo": "soma",
+          "dependencias": [
+            "aviso_previo",
+            "multa_fgts",
+            "contribuicao_social_rescisao"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT; Lei nº 8.036/1990; LC nº 110/2001",
+            "observacoes": "Consolidação das provisões rescisórias; provisões relacionadas a férias/13º já computadas em encargos_beneficios_total"
+          }
+        }
+      ]
+    },
+
+    "citl": {
+      "nos": [
+        {
+          "id": "custo_direto_trabalhador",
+          "tipo": "soma",
+          "dependencias": [
+            "remuneracao_total",
+            "encargos_beneficios_total",
+            "insumos_total",
+            "custo_ausencias_legais"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Metodologia SEGES; IN nº 05/2017 (Anexo VII). ",
+            "observacoes": "Base de incidência para custos indiretos, tributos e lucro — consolidação do custo direto do trabalhador"
+          }
+        },
+        {
+          "id": "percentual_custos_indiretos",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Diretriz SEGES; cadernos técnicos",
+            "observacoes": "Percentual definido por cenário (máximo/atenção) e informado no Contexto"
+          }
+        },
+        {
+          "id": "custos_indiretos",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "custo_direto_trabalhador",
+            "percentual_custos_indiretos"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017; metodologia SEGES",
+            "observacoes": "Incidência sobre o custo direto consolidado, conforme metodologia SEGES"
+          }
+        },
+        {
+          "id": "percentual_tributos",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Legislação tributária; acórdãos TCU (orientações sobre inclusão de tributos no custo)",
+            "observacoes": "Alíquotas (PIS/COFINS/ISS etc.) e tratamento dependem do regime tributário informado no Contexto"
+          }
+        },
+        {
+          "id": "tributos",
+          "tipo": "multiplicacao",
+          "dependencias": ["custo_direto_trabalhador", "percentual_tributos"],
+          "metadados_juridicos": {
+            "fundamento_legal": "LC nº 116/2003; legislação tributária aplicável",
+            "observacoes": "Tributos incidentes calculados sobre a base do custo direto conforme metodologia adotada"
+          }
+        },
+        {
+          "id": "percentual_lucro",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Metodologia SEGES; estudos FIA",
+            "observacoes": "Percentual de lucro definido por cenário (decisão humana registrada no Contexto)"
+          }
+        },
+        {
+          "id": "lucro",
+          "tipo": "multiplicacao",
+          "dependencias": ["custo_direto_trabalhador", "percentual_lucro"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Metodologia SEGES; cadernos técnicos",
+            "observacoes": "Remuneração empresarial aplicada sobre a base do custo direto"
+          }
+        },
+        {
+          "id": "citl_total",
+          "tipo": "soma",
+          "dependencias": ["custos_indiretos", "tributos", "lucro"],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017, Anexo VII; metodologia SEGES.",
+            "observacoes": "Consolidação final de Custos Indiretos, Tributos e Lucro (CITL) aplicada ao custo direto"
+          }
+        }
+      ]
+    },
+
+    "consolidacao": {
+      "nos": [
+        {
+          "id": "total_posto_mensal",
+          "tipo": "soma",
+          "dependencias": [
+            "remuneracao_total",
+            "encargos_beneficios_total",
+            "custo_ausencias_legais",
+            "insumos_total",
+            "rescisao_total",
+            "citl_total"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017, Anexo VII — metodologia de composição do custo total do posto.",
+            "observacoes": "Agregação final do custo mensal do posto de trabalho."
+          }
+        }
+      ]
+    }
+  },
+
+  "raiz": "total_posto_mensal"
+}

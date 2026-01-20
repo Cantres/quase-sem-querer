@@ -1,0 +1,7 @@
+# Força LF no repositório (padrão multiplataforma)
+* text=auto eol=lf
+
+# Binários
+*.png binary
+*.jpg binary
+*.pdf binary

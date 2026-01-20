@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quase-sem-querer"
+version = "0.1.0"
+description = "Aplicativo de composição de custos para apoio à decisão administrativa"
+requires-python = ">=3.11"
+dependencies = [
+    "streamlit>=1.53",
+    "pandas>=2.0",
+]
+
+[project.scripts]
+qsk = "quase_sem_querer.interface.cli:main"
+
+[tool.setuptools]
+packages = ["quase_sem_querer"]
+
+[tool.setuptools.package-dir]
+"" = "src"

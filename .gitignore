@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+
+# Streamlit
+.streamlit/
+
+# Resultados gerados
+src/quase_sem_querer/resultados/execucoes/
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+
+# Artefatos de empacotamento
+*.egg-info/
+
+# Docs
+quase_sem_querer/docs

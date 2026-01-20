@@ -1,0 +1,91 @@
+{
+  "tipo": "super_contexto",
+  "modulos": {
+    "remuneracao": {
+      "percentual_insalubridade": {
+        "valor": [0.0, 0.1, 0.2, 0.4],
+        "origem": "CLT art. 192",
+        "referencia_documental": "Adicional de insalubridade: mínimo, médio ou máximo"
+      },
+      "percentual_periculosidade": {
+        "valor": [0.0, 0.3],
+        "origem": "CLT art. 193",
+        "referencia_documental": "Adicional de periculosidade"
+      },
+      "percentual_noturno": {
+        "valor": [0.0, 0.2],
+        "origem": "CLT art. 73",
+        "referencia_documental": "Adicional noturno urbano"
+      }
+    },
+
+    "encargos_beneficios": {
+      "percentual_fgts": {
+        "valor": 0.08,
+        "origem": "Lei 8.036/1990",
+        "referencia_documental": "Depósito mensal FGTS"
+      },
+      "percentual_fgts_rescisorio": {
+        "valor": 0.032,
+        "origem": "Lei 8.036/1990",
+        "referencia_documental": "FGTS rescisório mensal (contratos a termo)"
+      },
+      "percentual_multa_fgts": {
+        "valor": 0.4,
+        "origem": "Lei 8.036/1990",
+        "referencia_documental": "Multa rescisória FGTS"
+      },
+      "percentual_encargos_previdenciarios": {
+        "valor": 0.2,
+        "origem": "Lei 8.212/1991",
+        "referencia_documental": "Contribuição previdenciária patronal"
+      },
+      "percentual_rat": {
+        "valor": [0.01, 0.02, 0.03],
+        "origem": "Lei 8.212/1991",
+        "referencia_documental": "Risco Ambiental do Trabalho"
+      },
+      "percentual_terceiros": {
+        "valor": [0.0058, 0.035],
+        "origem": "Legislação sistema S / Salário-Educação",
+        "referencia_documental": "Contribuições a terceiros (varia por CNAE)"
+      },
+      "percentual_decimo_terceiro": {
+        "valor": 0.0833,
+        "origem": "Lei 4.090/1962",
+        "referencia_documental": "1/12 do salário"
+      },
+      "percentual_ferias": {
+        "valor": [0.0333, 0.1111],
+        "origem": "CF/88 art. 7º, XVII",
+        "referencia_documental": "Férias + 1/3 constitucional."
+      }
+    },
+
+    "ausencias_legais": {
+      "percentual_maternidade": {
+        "valor": 0.3333,
+        "origem": "Lei 8.213/1991",
+        "referencia_documental": "Licença-maternidade (120 dias)"
+      },
+      "percentual_paternidade": {
+        "valor": 0.0167,
+        "origem": "ADCT art. 10",
+        "referencia_documental": "Licença-paternidade (5 dias)"
+      }
+    },
+
+    "rescisao": {
+      "percentual_aviso_previo": {
+        "valor": 0.0833,
+        "origem": "Lei 12.506/2011",
+        "referencia_documental": "Aviso prévio indenizado (médio mensalizado)"
+      },
+      "percentual_contribuicao_social_rescisao": {
+        "valor": 0.1,
+        "origem": "LC 110/2001",
+        "referencia_documental": "Contribuição social FGTS"
+      }
+    }
+  }
+}

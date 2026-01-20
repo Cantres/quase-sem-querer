@@ -1,0 +1,23 @@
+{
+  "meta_execucao": {
+    "id_execucao": "execucao_YYYYMMDD_HHMMSS",
+    "modelo_normativo": "hash_do_modelo",
+    "contexto": "hash_do_contexto",
+    "data_execucao": "ISO-8601"
+  },
+  "resultado": {
+    "valor_final": 0.0,
+    "trilha_calculo": {
+      "id_no": {
+        "tipo": "soma | multiplicacao | constante | referencia",
+        "dependencias": ["id_dependencia_1", "id_dependencia_2"],
+        "valor_calculado": 0.0,
+        "metadados_juridicos": {
+          "fundamento_legal": "...",
+          "observacoes": "...",
+          "vigencia": "..."
+        }
+      }
+    }
+  }
+}
