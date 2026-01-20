@@ -12,6 +12,7 @@ from quase_sem_querer.relatorios.memoria_calculo import render_memoria_calculo
 from quase_sem_querer.contextos.gerador_contexto_operacional import (
     gerar_super_contexto_operacional
 )
+from quase_sem_querer.interface.arvore_calculo import render_no
 
 
 # ----------------------------------------------------------------
@@ -261,6 +262,19 @@ elif st.session_state.etapa == 4:
             )
 
             st.success("Cálculo executado com sucesso")
+
+            # -------------------------------------------------------------
+            # Árvore de cálculo
+            # -------------------------------------------------------------
+            st.subheader("🌳 Árvore do cálculo (visualização explicativa)")
+
+            render_no(
+                no_id=resultado["no_raiz"],
+                nos_avaliados=resultado["nos_avaliados"],
+            )
+            # -------------------------------------------------------------
+            # Resultado
+            # -------------------------------------------------------------
 
             st.subheader("Resultado canônico")
             st.json(resultado)
