@@ -1,0 +1,1380 @@
+{
+  "tipo": "super_modelo",
+  "modulos": {
+    "remuneracao": {
+      "nos": [
+        {
+          "id": "salario_base",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Parágrafo primeiro da cláusula quarta da CCT (piso salarial); IN/SEGES.",
+            "observacoes": "Valor informado no Contexto (p.ex. por categoria/profissional)."
+          }
+        },
+        {
+          "id": "gratificacao_funcao",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art. 457; convenção/contrato.",
+            "observacoes": "Informada no Contexto quando aplicável."
+          }
+        },
+
+        {
+          "id": "base_calculo_insalubridade",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art. 192; NR-15; Súmula 448/TST.",
+            "observacoes": "Base de incidência da insalubridade é definida no Contexto (ex.: salario_minimo_regional ou salario_base). Decisão humana necessária."
+          }
+        },
+        {
+          "id": "percentual_insalubridade",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "NR-15 / laudo técnico.",
+            "observacoes": "Percentual conforme grau técnico (informar no Contexto)."
+          }
+        },
+        {
+          "id": "adicional_insalubridade",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_calculo_insalubridade",
+            "percentual_insalubridade"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art. 192; NR-15; Súmula 448/TST.",
+            "observacoes": "Incidência declarativa: Base * Percentual (base definida no Contexto)."
+          }
+        },
+
+        {
+          "id": "percentual_periculosidade",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art. 193; Portaria/NR aplicável; CCT local.",
+            "observacoes": "Percentual legal usuais (p.ex. 30%) — valor a ser fornecido no Contexto."
+          }
+        },
+        {
+          "id": "adicional_periculosidade",
+          "tipo": "multiplicacao",
+          "dependencias": ["salario_base", "percentual_periculosidade"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art. 193; CCT e jurisprudência.",
+            "observacoes": "CT-VIG: base de cálculo é o salário-base; regra declarativa: SalárioBase * PercentualPericulosidade."
+          }
+        },
+
+        {
+          "id": "base_noturno",
+          "tipo": "soma",
+          "dependencias": ["salario_base", "adicional_periculosidade"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Interpretação segundo CT-VIG: base adicional noturno = SalárioBase + AdicionalPericulosidade.",
+            "observacoes": "Expressa explicitamente para evitar lógica oculta."
+          }
+        },
+
+        {
+          "id": "proporcao_horas_noturnas",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art.73, regras de jornada; acordos/escala (ex.: 12x36).",
+            "observacoes": "Proporção de horas noturnas (ex.: 58.33% para 12x36 noite)."
+          }
+        },
+        {
+          "id": "percentual_noturno",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art.73; convenção coletiva.",
+            "observacoes": "Percentual do adicional noturno (ex.: 20%); informar no Contexto quando variável."
+          }
+        },
+        {
+          "id": "adicional_noturno",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_noturno",
+            "proporcao_horas_noturnas",
+            "percentual_noturno"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art.73; interpretação CT-VIG.",
+            "observacoes": "Cálculo: (SalárioBase + AdicionalPericulosidade) * ProporcaoHorasNoturnas * PercentualNoturno."
+          }
+        },
+
+        {
+          "id": "proporcao_hora_noturna_reduzida",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT / acordos; prática SEGES.",
+            "observacoes": "Ex.: 8,33% (1/12) em regimes mensais; informar no Contexto."
+          }
+        },
+        {
+          "id": "fator_hora_noturna_reduzida",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT / convenção (multiplicador horário noturno reduzido).",
+            "observacoes": "Ex.: 1.20 (hora noturna remunerada a 120%)."
+          }
+        },
+        {
+          "id": "hora_noturna_reduzida",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_noturno",
+            "proporcao_hora_noturna_reduzida",
+            "fator_hora_noturna_reduzida"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG: cálculo por fração de hora noturna reduzida.",
+            "observacoes": "Cálculo: (SalárioBase + AdicionalPericulosidade) * ProporcaoHoraNoturnaReduzida * FatorHoraNoturnaReduzida."
+          }
+        },
+
+        {
+          "id": "adicional_por_trabalho_noturno",
+          "tipo": "soma",
+          "dependencias": ["adicional_noturno", "hora_noturna_reduzida"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Agregação operacional conforme CT-VIG.",
+            "observacoes": "Soma dos componentes noturnos apresentados no CT-VIG."
+          }
+        },
+
+        {
+          "id": "remuneracao_total_mensal",
+          "tipo": "soma",
+          "dependencias": [
+            "salario_base",
+            "gratificacao_funcao",
+            "adicional_periculosidade",
+            "adicional_insalubridade",
+            "adicional_por_trabalho_noturno"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art.457; metodologia SEGES (CT-VIG).",
+            "observacoes": "Consolidação final das parcelas remuneratórias (rastreável por nó)."
+          }
+        }
+      ]
+    },
+
+    "encargos_beneficios": {
+      "nos": [
+        {
+          "id": "percentual_decimo_terceiro",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Decreto nº 57.155/1965; CF, art. 7º",
+            "observacoes": "1/12 do salário (modelo normativo exige valor no Contexto quando variante)."
+          }
+        },
+        {
+          "id": "decimo_terceiro",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "remuneracao_total_mensal",
+            "percentual_decimo_terceiro"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Decreto nº 57.155/1965",
+            "observacoes": "Provisão mensal proporcional do 13º salário."
+          }
+        },
+        {
+          "id": "percentual_ferias",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CF, art. 7º, XVII; CLT",
+            "observacoes": "Compreende férias + 1/3 constitucional; valor mensalizado no Contexto (para referência: 0,11)."
+          }
+        },
+        {
+          "id": "ferias",
+          "tipo": "multiplicacao",
+          "dependencias": ["remuneracao_total_mensal", "percentual_ferias"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT; jurisprudência",
+            "observacoes": "Provisão mensal correspondente a férias e adicional."
+          }
+        },
+        {
+          "id": "base_calculo_encargos_previdenciarios",
+          "tipo": "soma",
+          "dependencias": [
+            "ferias",
+            "decimo_terceiro",
+            "remuneracao_total_mensal"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CF, art. 195; Lei 8.212/1991",
+            "observacoes": "Base de cálculo dos encargos previdenciários, resultante da soma da remuneração com férias e terço constitucional"
+          }
+        },
+        {
+          "id": "percentual_encargos_previdenciarios",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CF, art. 195; Lei 8.212/1991",
+            "observacoes": "Alíquota patronal (INSS, RAT), definida no Contexto conforme regime."
+          }
+        },
+        {
+          "id": "encargos_previdenciarios",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_calculo_encargos_previdenciarios",
+            "percentual_encargos_previdenciarios"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei 8.212/1991",
+            "observacoes": "Incidência patronal sobre a base de remuneração consolidada."
+          }
+        },
+        {
+          "id": "percentual_fgts",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.036/1990, art. 15",
+            "observacoes": "Percentual legal do FGTS (modelo não atribui valor numérico)."
+          }
+        },
+        {
+          "id": "fgts",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_calculo_encargos_previdenciarios",
+            "percentual_fgts"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.036/1990",
+            "observacoes": "Depósito mensal sobre parcelas de natureza salarial."
+          }
+        },
+
+        {
+          "id": "vt_valor_unitario",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017; normas locais",
+            "observacoes": "Valor unitário da passagem informado no Contexto."
+          }
+        },
+        {
+          "id": "vt_vales_por_dia",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Prática operacional / contrato",
+            "observacoes": "Número de vales por dia; informado no Contexto."
+          }
+        },
+        {
+          "id": "vt_dias_trabalhados",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Regime de jornada (CT-VIG exemplos)",
+            "observacoes": "Dias efetivamente trabalhados no mês; informado no Contexto."
+          }
+        },
+        {
+          "id": "vt_custo_total",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "vt_valor_unitario",
+            "vt_vales_por_dia",
+            "vt_dias_trabalhados"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG: cálculo do custo do vale-transporte",
+            "observacoes": "Vr. Unitário * Vales por dia * Dias trabalhados."
+          }
+        },
+        {
+          "id": "vt_percentual_desconto",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei / política PAT",
+            "observacoes": "Percentual de desconto suportado pelo empregado (se aplicável)."
+          }
+        },
+        {
+          "id": "vt_custo_efetivo",
+          "tipo": "multiplicacao",
+          "dependencias": ["vt_custo_total", "vt_percentual_desconto"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG: demonstração do custo efetivo = total - desconto",
+            "observacoes": "Será calculado como vt_custo_total * (1 - vt_percentual_desconto) se preferir, mas aqui modelado como multiplicação por (1 - desconto) fornecido no Contexto."
+          }
+        },
+
+        {
+          "id": "va_valor_diario",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG tabelas de alimentação",
+            "observacoes": "Valor diário do vale-alimentação/refeição informado no Contexto."
+          }
+        },
+        {
+          "id": "va_dias_trabalhados",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Regime de jornada / CT-VIG",
+            "observacoes": "Dias considerados para cálculo do benefício."
+          }
+        },
+        {
+          "id": "va_custo_total",
+          "tipo": "multiplicacao",
+          "dependencias": ["va_valor_diario", "va_dias_trabalhados"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG: custo total do benefício",
+            "observacoes": "Valor diário * dias trabalhados."
+          }
+        },
+        {
+          "id": "va_percentual_desconto",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Legislação PAT / convenção",
+            "observacoes": "Percentual descontado do benefício (ex.: 20% no CT-VIG exemplos)."
+          }
+        },
+        {
+          "id": "va_custo_efetivo",
+          "tipo": "multiplicacao",
+          "dependencias": ["va_custo_total", "va_percentual_desconto"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG: custo efetivo = total - desconto",
+            "observacoes": "Modelado como multiplicação por (1 - desconto) fornecido no Contexto."
+          }
+        },
+
+        {
+          "id": "trienio_valor",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CCT — cláusula sexta (CT-VIG)",
+            "observacoes": "Valor fixo mensal ou percentagem (CT-VIG informa R$ 13,28 para alguns casos)."
+          }
+        },
+        {
+          "id": "trienio_percentual_desconto",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "PAT / convenção",
+            "observacoes": "Percentual de desconto aplicável ao triênio (ex.: 20% em CT-VIG)."
+          }
+        },
+        {
+          "id": "trienio_custo_efetivo",
+          "tipo": "multiplicacao",
+          "dependencias": ["trienio_valor", "trienio_percentual_desconto"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG: triênio em formato benefício (valor fixo com desconto PAT)",
+            "observacoes": "Valor efetivo após desconto aplicado."
+          }
+        },
+
+        {
+          "id": "beneficios_mensais",
+          "tipo": "soma",
+          "dependencias": [
+            "vt_custo_efetivo",
+            "va_custo_efetivo",
+            "trienio_custo_efetivo"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 2.3 (benefícios mensais e diários)",
+            "observacoes": "Consolidação dos benefícios informados; cada componente é rastreável."
+          }
+        },
+
+        {
+          "id": "encargos_beneficios_total_mensal",
+          "tipo": "soma",
+          "dependencias": [
+            "decimo_terceiro",
+            "ferias",
+            "encargos_previdenciarios",
+            "fgts",
+            "beneficios_mensais"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017 (Anexo VII); CT-VIG (submódulos 2.1, 2.2, 2.3)",
+            "observacoes": "Consolidação final de encargos e benefícios (mensais/provisionados)."
+          }
+        }
+      ]
+    },
+
+    "provisao_rescisao": {
+      "nos": [
+        {
+          "id": "percentual_demissao_sem_justa_causa",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CAGED / estatística laboral (uso metodológico no CT-VIG)",
+            "observacoes": "Percentual por tipo de desligamento (estado/categoria). Ex.: 0.4505 para 45,05%."
+          }
+        },
+
+        {
+          "id": "percentual_demissao_com_justa_causa",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CAGED / estatística laboral",
+            "observacoes": "Percentual. Ex.: 0.0473 para 4,73%."
+          }
+        },
+
+        {
+          "id": "percentual_desligamentos_outros",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CAGED / estatística laboral",
+            "observacoes": "Percentual restante (outros tipos). Ex.: 0.5022 para 50,22%."
+          }
+        },
+
+        {
+          "id": "proporcao_ap_indenizado_sem_justa",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Metodologia CT-VIG (regra de limite máximo usada no caderno técnico)",
+            "observacoes": "Por padrão para cálculo de limites: 0.90 (90% das demissões sem justa causa)."
+          }
+        },
+
+        {
+          "id": "proporcao_ap_trabalhado_sem_justa",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Metodologia CT-VIG",
+            "observacoes": "Por padrão: 0.10 (10% das demissões sem justa causa)."
+          }
+        },
+
+        {
+          "id": "percentual_ap_sem_justa_indenizado",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — percentuais por tipo de desligamento e por subitem",
+            "observacoes": "Ex.: 0.4055 (40,55% — tabela CT-VIG)."
+          }
+        },
+
+        {
+          "id": "percentual_ap_sem_justa_trabalhado",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — percentuais por tipo de desligamento",
+            "observacoes": "Ex.: 0.0451 (4,51% — tabela CT-VIG)."
+          }
+        },
+
+        {
+          "id": "base_calculo_ap_indenizado",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG: Base = Módulo 1 + Módulo 2 (com a ressalva sobre GPS/INSS conforme caderno).",
+            "observacoes": "Base numérica para AP indenizado (ex.: 3312.88 para Vigilante 12x36 N)."
+          }
+        },
+
+        {
+          "id": "base_calculo_ap_trabalhado",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG: Base = Módulo 1 + Módulo 2.",
+            "observacoes": "Base numérica para AP trabalhado (ex.: 4102.29 para Vigilante 12x36 N)."
+          }
+        },
+
+        {
+          "id": "provisionamento_meses",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — parâmetro operacional (tempo médio de permanência)",
+            "observacoes": "Valor padrão do CT-VIG: 12 meses (usar contexto para alterar)."
+          }
+        },
+
+        {
+          "id": "provision_mes_indenizado",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_calculo_ap_indenizado",
+            "provisionamento_meses"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG (mensalização da provisão).",
+            "observacoes": "Implementado como: base_calculo_ap_indenizado ÷ provisionamento_meses. Para evitar divisão, o contexto deve fornecer provisionamento_meses como 1/meses (ou o interpretador amigável pode suportar divisão; aqui mantemos multiplicação por inverso quando necessário)."
+          }
+        },
+
+        {
+          "id": "provision_mes_trabalhado",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_calculo_ap_trabalhado",
+            "provisionamento_meses"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG (mensalização).",
+            "observacoes": "Mesma observação de representação para multiplicação/ divisão."
+          }
+        },
+
+        {
+          "id": "fgts_deposito_mensal",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Base de depósito mensal do FGTS (usada para cálculo de multa e contribuição social sobre aviso).",
+            "observacoes": "Ex.: 219.28, 180.23 — a informar no contexto."
+          }
+        },
+
+        {
+          "id": "percentual_multa_total",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG / Lei nº 8.036/1990 (configuração metodológica do caderno técnico)",
+            "observacoes": "Percentual aplicado sobre base do FGTS para alcançar multa+contribuição social (CT-VIG usa 0.50 = 50%)."
+          }
+        },
+
+        {
+          "id": "percentual_multa_fgts",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.036/1990 (multa sobre FGTS)",
+            "observacoes": "Parte da multa total (ex.: 0.40 = 40%)."
+          }
+        },
+
+        {
+          "id": "percentual_contribuicao_social_rescisao",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei Complementar nº 110/2001; CT-VIG",
+            "observacoes": "Parte da 50% que corresponde à contribuição social (ex.: 0.10 = 10%)."
+          }
+        },
+
+        {
+          "id": "multa_fgts",
+          "tipo": "multiplicacao",
+          "dependencias": ["fgts_deposito_mensal", "percentual_multa_fgts"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Lei nº 8.036/1990, art. 18; CT-VIG",
+            "observacoes": "Cálculo: depósito mensal FGTS × percentual_multa_fgts (ex.: 180.23 × 0.40 = 72,09)."
+          }
+        },
+
+        {
+          "id": "contribuicao_social_sobre_aviso",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "fgts_deposito_mensal",
+            "percentual_contribuicao_social_rescisao"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "LC nº 110/2001; CT-VIG",
+            "observacoes": "Cálculo: depósito mensal FGTS × percentual_contribuicao_social_rescisao."
+          }
+        },
+
+        {
+          "id": "base_custo_indenizado_para_percentual",
+          "tipo": "soma",
+          "dependencias": [
+            "provision_mes_indenizado",
+            "multa_fgts",
+            "contribuicao_social_sobre_aviso"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — definição de base para aplicação do percentual por tipo",
+            "observacoes": "Base utilizada para aplicar o percentual indicado na tabela do CT-VIG (ex.: 322.26)."
+          }
+        },
+
+        {
+          "id": "valor_ap_indenizado",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_custo_indenizado_para_percentual",
+            "percentual_ap_sem_justa_indenizado"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 3.1 (valor = base × percentual).",
+            "observacoes": "Exemplo: 322.26 × 0.4055 = 130.66 (Vigilante 12x36 D exemplo no CT-VIG)."
+          }
+        },
+
+        {
+          "id": "base_custo_trabalhado_para_percentual",
+          "tipo": "soma",
+          "dependencias": [
+            "provision_mes_trabalhado",
+            "multa_fgts",
+            "contribuicao_social_sobre_aviso"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 3.2.",
+            "observacoes": "Base utilizada para aplicar percentual do AP trabalhado."
+          }
+        },
+
+        {
+          "id": "valor_ap_trabalhado",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "base_custo_trabalhado_para_percentual",
+            "percentual_ap_sem_justa_trabalhado"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 3.2 (valor = base × percentual).",
+            "observacoes": "Exemplo: 3.434,54 ÷ 12 = 286.21; aplicação do percentual apropriado."
+          }
+        },
+
+        {
+          "id": "valor_justa_causa",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 3.3 e decisões locais",
+            "observacoes": "Valor a considerar para demissão por justa causa (pode ser zero ou outro valor; informar no Contexto)."
+          }
+        },
+
+        {
+          "id": "provisao_rescisao_total_mensal",
+          "tipo": "soma",
+          "dependencias": [
+            "valor_ap_indenizado",
+            "valor_ap_trabalhado",
+            "valor_justa_causa"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017 (Anexo VII) e CT-VIG (Módulo 3 — provisões rescisórias).",
+            "observacoes": "Consolidação das parcelas previstas no módulo de provisões rescisórias."
+          }
+        }
+      ]
+    },
+
+    "reposicao_profissional_ausente": {
+      "nos": [
+        {
+          "id": "incidencia_ferias",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG Módulo 4 — Submódulo 4.1",
+            "observacoes": "Incidência anual (ex.: 1.0)"
+          }
+        },
+        {
+          "id": "duracao_ferias",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT/CT-VIG",
+            "observacoes": "Duração legal em dias (ex.: 30)"
+          }
+        },
+        {
+          "id": "proporcao_dias_afetados_ferias",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG (12x36 usa 50%; 44h usa 69,86%)",
+            "observacoes": "Proporção a aplicar"
+          }
+        },
+        {
+          "id": "dias_reposicao_ferias",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "incidencia_ferias",
+            "duracao_ferias",
+            "proporcao_dias_afetados_ferias"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG Módulo 4 — fórmula de dias de reposição",
+            "observacoes": "(incidência × duração) × proporção"
+          }
+        },
+
+        {
+          "id": "incidencia_ausencia_justificada",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": "Incidência anual (ex.:1.0 → 1 dia/ano)"
+          }
+        },
+        {
+          "id": "duracao_ausencia_justificada",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG / CLT",
+            "observacoes": "Duração legal (dias)"
+          }
+        },
+        {
+          "id": "proporcao_dias_afetados_ausencia_justificada",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG",
+            "observacoes": "Proporção (ex.:100% para ausências justificadas)"
+          }
+        },
+
+        {
+          "id": "dias_reposicao_ausencia_justificada",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "incidencia_ausencia_justificada",
+            "duracao_ausencia_justificada",
+            "proporcao_dias_afetados_ausencia_justificada"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": ""
+          }
+        },
+        {
+          "id": "incidencia_curso_reciclagem",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": "Incidência anual (ex.:1.0 → 1 dia/ano)"
+          }
+        },
+        {
+          "id": "duracao_curso_reciclagem",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG / CLT",
+            "observacoes": "Duração legal (dias)"
+          }
+        },
+        {
+          "id": "proporcao_dias_afetados_curso_reciclagem",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG",
+            "observacoes": "Proporção (ex.:50% para curso reciclagem)"
+          }
+        },
+        {
+          "id": "dias_reposicao_curso_reciclagem",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "incidencia_curso_reciclagem",
+            "duracao_curso_reciclagem",
+            "proporcao_dias_afetados_curso_reciclagem"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": ""
+          }
+        },
+        {
+          "id": "incidencia_acidente_trabalho",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": "Incidência anual (ex.:1.0 → 1 dia/ano)"
+          }
+        },
+        {
+          "id": "duracao_acidente_trabalho",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG / CLT",
+            "observacoes": "Duração legal (dias)"
+          }
+        },
+        {
+          "id": "proporcao_dias_afetados_acidente_trabalho",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG",
+            "observacoes": "Proporção (ex.:50% para 12x36)"
+          }
+        },
+        {
+          "id": "dias_reposicao_acidente_trabalho",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "incidencia_acidente_trabalho",
+            "duracao_acidente_trabalho",
+            "proporcao_dias_afetados_acidente_trabalho"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": ""
+          }
+        },
+        {
+          "id": "incidencia_afastamento_doenca",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": "Incidência anual (ex.:1.0 → 1 dia/ano)"
+          }
+        },
+        {
+          "id": "duracao_afastamento_doenca",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG / CLT",
+            "observacoes": "Duração legal (dias)"
+          }
+        },
+        {
+          "id": "proporcao_dias_afetados_afastamento_doenca",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG",
+            "observacoes": "Proporção (ex.:50% para 12x36)"
+          }
+        },
+        {
+          "id": "dias_reposicao_afastamento_doenca",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "incidencia_afastamento_doenca",
+            "duracao_afastamento_doenca",
+            "proporcao_dias_afetados_afastamento_doenca"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": ""
+          }
+        },
+        {
+          "id": "incidencia_consulta_medica_filho",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": "Incidência anual (ex.:1.0 → 1 dia/ano)"
+          }
+        },
+        {
+          "id": "duracao_consulta_medica_filho",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG / CLT",
+            "observacoes": "Duração legal (dias)"
+          }
+        },
+        {
+          "id": "proporcao_dias_afetados_consulta_medica_filho",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG",
+            "observacoes": "Proporção (ex.:50% para 12x36)"
+          }
+        },
+        {
+          "id": "dias_reposicao_consulta_medica_filho",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "incidencia_consulta_medica_filho",
+            "duracao_consulta_medica_filho",
+            "proporcao_dias_afetados_consulta_medica_filho"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": ""
+          }
+        },
+        {
+          "id": "incidencia_outros",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": "Incidência anual (ex.:1.0 → 1 dia/ano)"
+          }
+        },
+        {
+          "id": "duracao_outros",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG / CLT",
+            "observacoes": "Duração legal (dias)"
+          }
+        },
+        {
+          "id": "proporcao_dias_afetados_outros",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG",
+            "observacoes": "Proporção (ex.:50% para 12x36)"
+          }
+        },
+        {
+          "id": "dias_reposicao_outros",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "incidencia_outros",
+            "duracao_outros",
+            "proporcao_dias_afetados_outros"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Submódulo 4.1",
+            "observacoes": ""
+          }
+        },
+        {
+          "id": "dias_reposicao_total_anuais",
+          "tipo": "soma",
+          "dependencias": [
+            "dias_reposicao_ferias",
+            "dias_reposicao_ausencia_justificada",
+            "dias_reposicao_curso_reciclagem",
+            "dias_reposicao_acidente_trabalho",
+            "dias_reposicao_afastamento_doenca",
+            "dias_reposicao_consulta_medica_filho",
+            "dias_reposicao_outros"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG Módulo 4 — agregação das necessidades",
+            "observacoes": "Soma dos dias de reposição por evento (ano)."
+          }
+        },
+
+        {
+          "id": "base_calculo_repositor",
+          "tipo": "soma",
+          "dependencias": [
+            "remuneracao_total_mensal",
+            "encargos_beneficios_total_mensal",
+            "provisao_rescisao_total_mensal"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG: Base = Módulo1 + Módulo2 + Módulo3",
+            "observacoes": "Base para cálculo do custo diário do repositor, resultante da soma do Módulo 1, 2 e 3."
+          }
+        },
+
+        {
+          "id": "divisor_dia_inverse",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CLT art.64 / CT-VIG",
+            "observacoes": "Preferível fornecer 1/30 (ex.: 0.0333333) para evitar divisão no interpretador."
+          }
+        },
+
+        {
+          "id": "custo_diario_repositor",
+          "tipo": "multiplicacao",
+          "dependencias": ["base_calculo_repositor", "divisor_dia_inverse"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — custo diário = base ÷ 30 (modelo usa multiplicação por inverso)",
+            "observacoes": "Base * (1/30) => custo diário."
+          }
+        },
+
+        {
+          "id": "custo_anual_reposicao_ausencias_legais",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "custo_diario_repositor",
+            "dias_reposicao_total_anuais"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Custo anual = custo diário × dias de reposição (ano)",
+            "observacoes": ""
+          }
+        },
+        {
+          "id": "fator_para_mensalizacao",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — Custo mensal = custo anual / 12",
+            "observacoes": "Para realizar o cálculo, sugere-se a multiplicacao por 0,8333, que equivale a 1/12"
+          }
+        },
+
+        {
+          "id": "custo_mensal_reposicao_ausencias_legais",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "custo_anual_reposicao_ausencias_legais",
+            "fator_para_mensalizacao"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — conversão anual → mensal",
+            "observacoes": "Interpretador deve dividir por 12; alternativamente forneça multiplicador 1/12 no contexto."
+          }
+        },
+
+        {
+          "id": "divisor_hora_inverse",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CCT / CT-VIG (divisor de hora 220)",
+            "observacoes": "Fornecer 1/220 se preferir multiplicação."
+          }
+        },
+
+        {
+          "id": "custo_hora_repositor",
+          "tipo": "multiplicacao",
+          "dependencias": ["base_calculo_repositor", "divisor_hora_inverse"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — custo hora = base ÷ 220 (modelo usa inverso)",
+            "observacoes": "Usado no Submódulo 4.2 (intrajornada)."
+          }
+        },
+
+        {
+          "id": "necessidade_reposicao_intrajornada_horas",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG Módulo 4 Submódulo 4.2",
+            "observacoes": "Número de horas por mês/ano para reposição de intervalos (ex.: 15 horas) fornecido no Contexto."
+          }
+        },
+
+        {
+          "id": "valor_intrajornada_anual",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "custo_hora_repositor",
+            "necessidade_reposicao_intrajornada_horas"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG Submódulo 4.2 — custo intrajornada = custo hora × necessidade (horas)",
+            "observacoes": ""
+          }
+        },
+
+        {
+          "id": "reposicao_total_mensal",
+          "tipo": "soma",
+          "dependencias": [
+            "custo_mensal_reposicao_ausencias_legais",
+            "valor_intrajornada_anual"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — consolidação Submódulos 4.1 + 4.2",
+            "observacoes": "Nota: valor_intrajornada_anual pode ser convertido para mensal conforme necessidade do interpretador/contexto."
+          }
+        }
+      ]
+    },
+
+    "insumos_mao_obra": {
+      "nos": [
+        {
+          "id": "insumos_uniformes_epi",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "NRs do MTE; IN nº 05/2017",
+            "observacoes": "Custos mensais (uniformes, EPI). Informados no Contexto."
+          }
+        },
+
+        {
+          "id": "insumos_materiais_operacionais",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017; especificações contratuais",
+            "observacoes": "Custos mensais de materiais, manutenção, substituição de equipamentos — informados no Contexto."
+          }
+        },
+
+        {
+          "id": "insumos_total_mensal",
+          "tipo": "soma",
+          "dependencias": [
+            "insumos_uniformes_epi",
+            "insumos_materiais_operacionais"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG / IN nº 05/2017 — consolidação de custo de insumos",
+            "observacoes": "Valor final dos insumos de mão de obra. Se optar pelo método percentual (CT-VIG) mantenha os itens itemizados em zero."
+          }
+        }
+      ]
+    },
+
+    "citl": {
+      "nos": [
+        {
+          "id": "custo_direto_mensal_trabalhador",
+          "tipo": "soma",
+          "dependencias": [
+            "remuneracao_total_mensal",
+            "encargos_beneficios_total_mensal",
+            "provisao_rescisao_total_mensal",
+            "reposicao_total_mensal",
+            "insumos_total_mensal"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Metodologia SEGES / IN nº 05/2017 (Anexo VII)",
+            "observacoes": "Base de incidência: Módulos 1 + 2 + 3 + 4 + 5"
+          }
+        },
+
+        {
+          "id": "percentual_custos_indiretos",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Diretriz SEGES; estudos FIA (base CT-VIG)",
+            "observacoes": "Percentual CI (ex.: 6% conforme CT-VIG). Fornecido no Contexto."
+          }
+        },
+
+        {
+          "id": "pis_percentual",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Legislação PIS",
+            "observacoes": "PIS em percentual absoluto (ex.: 0.65%). Opcional — usado para decomposição do percentual_tributos."
+          }
+        },
+
+        {
+          "id": "cofins_percentual",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Legislação COFINS",
+            "observacoes": "COFINS percentual (ex.: 3%). Opcional."
+          }
+        },
+
+        {
+          "id": "iss_percentual",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "LC nº 116/2003 (ISS)",
+            "observacoes": "ISS percentual (ex.: 5%). Opcional."
+          }
+        },
+
+        {
+          "id": "percentual_tributos",
+          "tipo": "soma",
+          "dependencias": [
+            "pis_percentual",
+            "cofins_percentual",
+            "iss_percentual"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Legislação tributária; estudos FIA (CT-VIG)",
+            "observacoes": "Percentual T agregado (ex.: 8,65%) da soma de PIS, COFINS e ISS."
+          }
+        },
+
+        {
+          "id": "percentual_tributos_negativo",
+          "tipo": "multiplicacao",
+          "dependencias": ["percentual_tributos", "fator_1_subtracao_formula"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Legislação tributária; estudos FIA (CT-VIG)",
+            "observacoes": "Percentual T agregado (ex.: 8,65%) multiplicado por -1"
+          }
+        },
+
+        {
+          "id": "percentual_lucro",
+          "tipo": "referencia",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Metodologia SEGES; estudos FIA",
+            "observacoes": "Percentual de lucro (L) antes do IR, definido pelo cenário/gestor (ex.: 6,79%)."
+          }
+        },
+
+        {
+          "id": "percentual_lucro_negativo",
+          "tipo": "multiplicacao",
+          "dependencias": ["percentual_lucro", "fator_1_subtracao_formula"],
+          "metadados_juridicos": {
+            "fundamento_legal": "Metodologia SEGES; estudos FIA",
+            "observacoes": "Percentual de lucro (L) antes do IR, multiplicado por -1."
+          }
+        },
+
+        {
+          "id": "fator_1_soma_formula",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Fórmula adotada pela FIA — Módulo 6",
+            "observacoes": "Valor +1 pela fórmula: (1 + CI) / (1 - T - L) - 1."
+          }
+        },
+        {
+          "id": "fator_1_subtracao_formula",
+          "tipo": "constante",
+          "dependencias": [],
+          "metadados_juridicos": {
+            "fundamento_legal": "Fórmula adotada pela FIA — Módulo 6",
+            "observacoes": "Valor -1 pela fórmula: (1 + CI) / (1 - T - L) - 1."
+          }
+        },
+        {
+          "id": "resolucao_bloco_1_formula",
+          "tipo": "soma",
+          "dependencias": [
+            "fator_1_soma_formula",
+            "percentual_custos_indiretos"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Fórmula adotada pela FIA — Módulo 6",
+            "observacoes": "Equivalente a expressão (1 + CI) da fórmula (1 + CI) / (1 - T - L) - 1."
+          }
+        },
+        {
+          "id": "resolucao_bloco_2_formula",
+          "tipo": "soma",
+          "dependencias": [
+            "fator_1_soma_formula",
+            "percentual_tributos_negativo",
+            "percentual_lucro_negativo"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Fórmula adotada pela FIA — Módulo 6",
+            "observacoes": "Equivalente a expressão (1 - T - L) da fórmula (1 + CI) / (1 - T - L) - 1."
+          }
+        },
+        {
+          "id": "resolucao_bloco_3_formula",
+          "tipo": "divisao",
+          "dependencias": [
+            "resolucao_bloco_1_formula",
+            "resolucao_bloco_2_formula"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "Fórmula adotada pela FIA — Módulo 6",
+            "observacoes": "Equivalente a expressão (1 + CI) / (1 - T - L) da fórmula (1 + CI) / (1 - T - L) - 1."
+          }
+        },
+        {
+          "id": "percentual_citl_formula",
+          "tipo": "subtracao",
+          "dependencias": ["resolucao_bloco_3_formula", "fator_1_soma_formula"],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG (fórmula adotada pela FIA) — Módulo 6",
+            "observacoes": "Percentual CITL pela fórmula: (1 + CI) / (1 - T - L) - 1. Equivalente a operação final."
+          }
+        },
+        {
+          "id": "citl_total_mensal",
+          "tipo": "multiplicacao",
+          "dependencias": [
+            "custo_direto_mensal_trabalhador",
+            "percentual_citl_formula"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "CT-VIG — aplicação do percentual consolidado sobre a base",
+            "observacoes": "CITL = custo_direto_trabalhador * percentual_citl_formula. (método recomendado pelo CT-VIG para gerar o % consolidado)."
+          }
+        }
+      ]
+    },
+
+    "consolidacao": {
+      "nos": [
+        {
+          "id": "total_posto_mensal",
+          "tipo": "soma",
+          "dependencias": [
+            "remuneracao_total_mensal",
+            "encargos_beneficios_total_mensal",
+            "provisao_rescisao_total_mensal",
+            "reposicao_total_mensal",
+            "insumos_total_mensal",
+            "citl_total_mensal"
+          ],
+          "metadados_juridicos": {
+            "fundamento_legal": "IN nº 05/2017, Anexo VII — metodologia de composição do custo total do posto.",
+            "observacoes": "Agregação final do custo mensal do posto de trabalho."
+          }
+        }
+      ]
+    }
+  },
+
+  "raiz": "total_posto_mensal"
+}

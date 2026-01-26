@@ -13,6 +13,34 @@ from quase_sem_querer.contextos.gerador_contexto_operacional import (
     gerar_super_contexto_operacional
 )
 from quase_sem_querer.interface.arvore_calculo import render_no
+from quase_sem_querer.motor.orquestrador import executar_modelo
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+DIR_MODELOS = BASE_DIR / "modelos_normativos"
+DIR_CONTEXTOS = BASE_DIR / "contextos"
+
+import html
+import re
+
+def sanitizar_texto(texto: str) -> str:
+    if not texto:
+        return ""
+
+    texto = texto.strip()
+    texto = texto[:150]
+    texto = re.sub(r"[\x00-\x1f\x7f]", "", texto)
+    texto = html.escape(texto)
+    return texto
+
+
+def listar_jsons(diretorio: Path) -> list[str]:
+    if not diretorio.exists():
+        return []
+    return sorted(
+        [p.name for p in diretorio.glob("*.json") if p.is_file()]
+    )
 
 
 # ----------------------------------------------------------------
@@ -21,6 +49,10 @@ from quase_sem_querer.interface.arvore_calculo import render_no
 
 if "etapa" not in st.session_state:
     st.session_state.etapa = 1
+
+if "ctx_operacional" not in st.session_state:
+    st.session_state.ctx_operacional = None
+
 
 # ----------------------------------------------------------------
 # Funções auxiliares
@@ -41,26 +73,34 @@ st.title("Quase Sem Querer — Sistema de Cálculo de Custos Operacionais")
 
 if st.session_state.etapa == 1:
     st.header("1️⃣ Modelo Normativo")
-    st.markdown("Selecione o **modelo normativo** que define a regra do cálculo.")
+    st.markdown("Selecione o **modelo normativo** disponível no sistema.")
 
-    # Drag and drop do modelo (preferencial)
-    modelo_file = st.file_uploader(
-        "modelo normativo (.json)",
-        type=["json"],
-        key="modelo_uploader",
+    modelos_disponiveis = listar_jsons(DIR_MODELOS)
+
+    if not modelos_disponiveis:
+        st.error("Nenhum modelo normativo encontrado no sistema.")
+        st.stop()
+
+    modelo_escolhido = st.selectbox(
+        "Modelo normativo",
+        modelos_disponiveis,
+        key="modelo_selecionado",
     )
 
-    if modelo_file is not None:
-        st.session_state.modelo_bytes = modelo_file.read()
-        st.session_state.modelo_nome = modelo_file.name
-        st.success(f"Modelo carregado: {modelo_file.name}")
+    if modelo_escolhido:
+        caminho_modelo = DIR_MODELOS / modelo_escolhido
+
+        with caminho_modelo.open("r", encoding="utf-8") as f:
+            st.session_state.modelo_bytes = f.read().encode("utf-8")
+            st.session_state.modelo_nome = modelo_escolhido
+
         modelo_json = json.loads(st.session_state.modelo_bytes)
         st.session_state.no_raiz_modelo = modelo_json.get("raiz")
 
-    # Botão explícito de avanço (evita salto automático)
+        st.success(f"Modelo selecionado: {modelo_escolhido}")
+
     st.button(
         "Próximo →",
-        key="btn_etapa1",
         on_click=avancar,
         disabled="modelo_bytes" not in st.session_state,
     )
@@ -72,21 +112,24 @@ if st.session_state.etapa == 1:
 
 elif st.session_state.etapa == 2:
     st.header("2️⃣ Constantes Legais")
-    st.markdown("Escolha os valores **definidos em lei**.")
+    st.markdown("Selecione o **contexto de constantes legais**.")
 
-    # Drag and drop do contexto legal
-    ctx_legal_file = st.file_uploader(
-        "Contexto de constantes legais (.json)",
-        type=["json"],
-        key="ctx_legal_uploader",
-    )
+    contextos_disponiveis = listar_jsons(DIR_CONTEXTOS)
 
-    if ctx_legal_file is None:
-        st.info("Carregue o contexto de constantes legais para continuar.")
-        st.button("← Voltar", on_click=voltar)
+    if not contextos_disponiveis:
+        st.error("Nenhum contexto legal encontrado no sistema.")
         st.stop()
 
-    ctx_legal = json.load(ctx_legal_file)
+    contexto_escolhido = st.selectbox(
+        "Contexto legal",
+        contextos_disponiveis,
+        key="contexto_legal_selecionado",
+    )
+
+    caminho_contexto = DIR_CONTEXTOS / contexto_escolhido
+
+    with caminho_contexto.open("r", encoding="utf-8") as f:
+        ctx_legal = json.load(f)
 
     decisoes_legais = {}
 
@@ -119,25 +162,27 @@ elif st.session_state.etapa == 2:
 
     col1, col2 = st.columns(2)
     with col1:
-        st.button("← Voltar", on_click=voltar, key="voltar2")
+        st.button("← Voltar", on_click=voltar)
     with col2:
-        st.button("Próximo →", on_click=avancar, key="avancar2")
+        st.button("Próximo →", on_click=avancar)
 
 # ----------------------------------------------------------------
-# ETAPA 3 — Valores operacionais editáveis
+# ETAPA 3 — Valores Operacionais Editáveis
 # ----------------------------------------------------------------
+
 
 elif st.session_state.etapa == 3:
     st.header("3️⃣ Valores Operacionais")
     st.markdown("Informe os valores **não definidos por lei**.")
 
-    # ------------------------------------------------------------
-    # Geração determinística do contexto operacional
-    # ------------------------------------------------------------
+    # ============================================================
+    # ESTADO 1 — Antes da geração do contexto operacional
+    # ============================================================
 
-    if "ctx_operacional" not in st.session_state:
+    if st.session_state["ctx_operacional"] is None:
         st.markdown("### Contexto operacional")
-        if st.button("🧠 Gerar contexto automaticamente"):
+
+        if st.button("🧠 Gerar contexto automaticamente", key="gerar_ctx_operacional"):
             modelo = json.loads(st.session_state.modelo_bytes)
 
             contexto_legal = {
@@ -152,64 +197,85 @@ elif st.session_state.etapa == 3:
                 contexto_legal=contexto_legal
             )
 
+            st.success("Contexto operacional gerado.")
+            st.rerun()
+
         st.info(
             "O contexto operacional é gerado automaticamente a partir do "
             "modelo normativo e das decisões legais já tomadas."
         )
-        st.stop()
 
-    ctx_operacional = st.session_state.ctx_operacional
+    # ============================================================
+    # ESTADO 2 — Contexto já gerado → renderização ORDENADA
+    # ============================================================
 
-    # ------------------------------------------------------------
-    # Renderização dos campos
-    # ------------------------------------------------------------
+    else:
+        ctx_operacional = st.session_state["ctx_operacional"]
+        valores_livres = {}
 
-    valores_livres = {}
+        modelo = json.loads(st.session_state.modelo_bytes)
+        modulos_modelo = modelo.get("modulos") or {}
+        modulos_ctx = ctx_operacional.get("modulos", {})
 
-    for modulo, campos in ctx_operacional.get("modulos", {}).items():
-        with st.expander(modulo.replace("_", " ").title(), expanded=True):
-            for chave, meta in campos.items():
-                col_valor, col_just = st.columns([1, 2])
-                valor_atual = meta.get("valor") or 0.0
+        for nome_modulo, conteudo_modulo in modulos_modelo.items():
+            nos = conteudo_modulo.get("nos", [])
+            campos_ctx = modulos_ctx.get(nome_modulo, {})
 
-                with col_valor:
-                    if chave.startswith("percentual_"):
-                        valor_pct = st.number_input(
-                            chave,
-                            value=float(valor_atual * 100),
-                            format="%.2f",
-                            help="Informe em percentual (ex: 5 = 5%)",
-                            key=f"operacional_pct_{chave}",
+            if not campos_ctx:
+                continue
+
+            with st.expander(nome_modulo.replace("_", " ").title(), expanded=True):
+                for no in nos:
+                    no_id = no.get("id")
+                    if no_id not in campos_ctx:
+                        continue
+
+                    meta = campos_ctx[no_id]
+                    valor_atual = meta.get("valor") or 0.0
+                    key_base = f"ctx_{nome_modulo}_{no_id}"
+
+                    col_valor, col_just = st.columns([1, 2])
+
+                    with col_valor:
+                        if "percentual" in no_id:
+                            valor_pct = st.number_input(
+                                no_id,
+                                value=float(valor_atual * 100),
+                                format="%.2f",
+                                key=f"{key_base}_pct",
+                            )
+                            valor = valor_pct / 100
+                        else:
+                            valor = st.number_input(
+                                no_id,
+                                value=float(valor_atual),
+                                key=f"{key_base}_val",
+                            )
+
+                    with col_just:
+                        justificativa = sanitizar_texto(
+                            st.text_input(
+                                "Justificativa / referência",
+                                value=meta.get("referencia_documental") or "",
+                                key=f"just_{key_base}",
+                                max_chars=150,
+                            )
                         )
-                        valor = valor_pct / 100
-                    else:
-                        valor = st.number_input(
-                            chave,
-                            value=float(valor_atual),
-                            key=f"operacional_val_{chave}",
-                        )
 
-                with col_just:
-                    justificativa = st.text_input(
-                        "Justificativa / referência",
-                        value=meta.get("referencia_documental") or "",
-                        key=f"just_{chave}",
-                        placeholder="Ex.: cláusula contratual, acordo coletivo, despacho…",
-                    )
+                    valores_livres[no_id] = {
+                        "valor": valor,
+                        "origem": "decisao_gestor",
+                        "referencia_documental": justificativa or None,
+                    }
 
-                valores_livres[chave] = {
-                    "valor": valor,
-                    "origem": "decisao_gestor",
-                    "referencia_documental": justificativa or None,
-                }
+        st.session_state.valores_livres = valores_livres
 
-    st.session_state.valores_livres = valores_livres
+        col1, col2 = st.columns(2)
+        with col1:
+            st.button("← Voltar", on_click=voltar)
+        with col2:
+            st.button("Próximo →", on_click=avancar)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button("← Voltar", on_click=voltar, key="voltar3b")
-    with col2:
-        st.button("Próximo →", on_click=avancar, key="avancar3")
 
 
 # ----------------------------------------------------------------
@@ -248,68 +314,61 @@ elif st.session_state.etapa == 4:
 
     st.info(f"Nó raiz do modelo: {st.session_state.no_raiz_modelo}")
 
-    if st.button("Executar cálculo"):
-        st.success("Pronto para executar via orquestrador.")
+    # --------------------------------------------
+    # Execução (ação)
+    # --------------------------------------------
 
-        from quase_sem_querer.motor.orquestrador import executar_modelo
-
+    if st.button("Executar cálculo", key="executar_calculo"):
         try:
-            resultado = executar_modelo(
+            st.session_state.resultado_execucao = executar_modelo(
                 nome_modelo=st.session_state.modelo_nome,
                 contexto=contexto_final,
                 no_raiz=st.session_state.no_raiz_modelo,
                 persistir=True,
             )
 
-            st.success("Cálculo executado com sucesso")
-
-            # -------------------------------------------------------------
-            # Árvore de cálculo
-            # -------------------------------------------------------------
-            st.subheader("🌳 Árvore do cálculo (visualização explicativa)")
-
-            render_no(
-                no_id=resultado["no_raiz"],
-                nos_avaliados=resultado["nos_avaliados"],
-            )
-            # -------------------------------------------------------------
-            # Resultado
-            # -------------------------------------------------------------
-
-            st.subheader("Resultado canônico")
-            st.json(resultado)
-
-            # -------------------------------------------------------------
-            # Memória de Cálculo
-            # -------------------------------------------------------------
-
-            memoria_md = render_memoria_calculo(
-                resultado,
-                formato="md",
-            )
-
-            memoria_txt = render_memoria_calculo(
-                resultado,
-                formato="txt",
-            )
-
-            st.download_button(
-                "📄 Baixar memória de cálculo (Markdown)",
-                data=memoria_md,
-                file_name="memoria_calculo.md",
-                mime="text/markdown",
-            )
-
-            st.download_button(
-                "📄 Baixar memória de cálculo (Texto)",
-                data=memoria_txt,
-                file_name="memoria_calculo.txt",
-                mime="text/plain",
-            )
 
         except Exception as e:
             st.error("Erro durante a execução do cálculo")
             st.exception(e)
+
+    # --------------------------------------------
+    # Exibição (estado)
+    # --------------------------------------------
+
+    if "resultado_execucao" in st.session_state:
+        resultado = st.session_state.resultado_execucao
+
+        # 🌳 Árvore
+        st.subheader("🌳 Árvore do cálculo (visualização explicativa)")
+        render_no(
+            no_id=resultado["no_raiz"],
+            nos_avaliados=resultado["nos_avaliados"],
+        )
+
+        # 📦 Resultado canônico
+        st.subheader("Resultado canônico")
+        st.json(resultado)
+
+        # 📄 Memória de cálculo
+        memoria_md = render_memoria_calculo(resultado, formato="md")
+        memoria_txt = render_memoria_calculo(resultado, formato="txt")
+
+        st.download_button(
+            "📄 Baixar memória de cálculo (Markdown)",
+            data=memoria_md,
+            file_name="memoria_calculo.md",
+            mime="text/markdown",
+            key="download_md",
+        )
+
+        st.download_button(
+            "📄 Baixar memória de cálculo (Texto)",
+            data=memoria_txt,
+            file_name="memoria_calculo.txt",
+            mime="text/plain",
+            key="download_txt",
+        )
 
 
 

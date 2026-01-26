@@ -10,10 +10,15 @@ from typing import Dict, Any
 import streamlit as st
 
 
-def _fmt_valor(v: float | None) -> str:
+def _fmt_valor(no_id: str, v: float | None) -> str:
     if v is None:
         return "—"
+
+    if no_id.startswith("percentual_"):
+        return f"{v * 100:.2f}%"
+
     return f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
 
 
 def render_no(
@@ -35,7 +40,7 @@ def render_no(
     deps = no.get("dependencias", [])
     meta = no.get("metadados_juridicos", {})
 
-    titulo = f"{no_id} — {_fmt_valor(valor)}"
+    titulo = f"{no_id} — {_fmt_valor(no_id, valor)}"
 
     # Indentação visual leve por nível (opcional)
     margem = nivel * 0.5

@@ -13,14 +13,16 @@
 
 from typing import Dict, List, Set
 
-
 TIPOS_VALIDOS = {
     "constante",
     "referencia",
     "soma",
-    "multiplicacao"
+    "multiplicacao",
+    "subtracao",
+    "divisao",
+    "potencia",
+    "raiz",
 }
-
 
 class ErroModeloInvalido(Exception):
     """Erro bloqueante contendo múltiplas inconsistências estruturais."""
@@ -37,9 +39,9 @@ class VerificadorEstatico:
         self.nos = self._indexar_nos()
         self.grafo = self._construir_grafo_dependencias()
 
-    # -----------------------------
-    # Indexação e estrutura básica
-    # -----------------------------
+        # -----------------------------
+        # Indexação e estrutura básica
+        # -----------------------------
 
     def _indexar_nos(self) -> Dict[str, Dict]:
         if "nos" not in self.modelo:
@@ -110,16 +112,22 @@ class VerificadorEstatico:
             tipo = no.get("tipo")
             deps = no.get("dependencias", [])
 
-            if tipo in ("soma", "multiplicacao") and len(deps) < 2:
+            # operações que exigem ao menos 2 operandos (vararg)
+            if tipo in ("soma", "multiplicacao", "subtracao", "divisao") and len(deps) < 2:
                 self.erros.append(
-                    f"Nó '{no_id}' do tipo '{tipo}' "
-                    f"deve possuir ao menos 2 dependências."
+                    f"Nó '{no_id}' do tipo '{tipo}' deve possuir ao menos 2 dependências."
                 )
 
+            # operações que exigem exatamente 2 operandos
+            if tipo in ("potencia", "raiz") and len(deps) != 2:
+                self.erros.append(
+                    f"Nó '{no_id}' do tipo '{tipo}' deve possuir exatamente 2 dependências."
+                )
+
+            # folhas não devem possuir dependências
             if tipo in ("constante", "referencia") and deps:
                 self.erros.append(
-                    f"Nó '{no_id}' do tipo '{tipo}' "
-                    f"não deve possuir dependências."
+                    f"Nó '{no_id}' do tipo '{tipo}' não deve possuir dependências."
                 )
 
     def _verificar_ciclos(self):
